@@ -4,7 +4,6 @@ import com.ll.tem.domain.post.post.entity.Post;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,19 +34,6 @@ public class PostController {
                 .content("내용3")
                 .build());
     }};
-
-    private String getFormHtml(String errorMessage, String title, String content) {
-        return """
-                <div>%s</div>
-                <form method="post">
-                    <input type="text" name="title" placeholder="제목" value="%s">
-                    <br>
-                    <textarea name="content" placeholder="내용">%s</textarea>
-                    <br>
-                    <button type="submit">글쓰기</button>
-                </form>
-                """.formatted(errorMessage, title, content);
-    }
 
     @GetMapping
     @ResponseBody
@@ -85,20 +71,12 @@ public class PostController {
     }
 
     @PostMapping("/write")
-    public ResponseEntity<String> write(
+    public String write(
             @Valid PostWriteForm form,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult
-                    .getAllErrors()
-                    .stream()
-                    .map(err -> err.getDefaultMessage())
-                    .sorted()
-                    .map(message -> message.split("-")[1])
-                    .collect(Collectors.joining("<br>"));
-
-            return ResponseEntity.badRequest().body(getFormHtml(errorMessage, form.title, form.content));
+            return "domain/post/post/write";
         }
 
         posts.add(
@@ -108,6 +86,6 @@ public class PostController {
                         .build()
         );
 
-        return ResponseEntity.status(302).header("Location", "/posts").build();
+        return "redirect:/posts";
     }
 }
