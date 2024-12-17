@@ -1,8 +1,10 @@
 package com.ll.tem.domain.post.post.controller;
 
+import com.ll.tem.domain.post.post.entity.Post;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +12,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/posts")
 public class PostController {
+    private List<Post> posts = new ArrayList<>() {{
+        add(Post.builder()
+                .title("제목1")
+                .content("내용1")
+                .build());
+
+        add(Post.builder()
+                .title("제목2")
+                .content("내용2")
+                .build());
+
+        add(Post.builder()
+                .title("제목3")
+                .content("내용3")
+                .build());
+    }};
+
     private String getFormHtml(String errorMessage, String title, String content) {
         return """
                 <div>%s</div>
@@ -31,17 +52,19 @@ public class PostController {
     @GetMapping
     @ResponseBody
     public String showList() {
-        String body =  """
+        String ul = "<ul>" + posts
+                .reversed()
+                .stream()
+                .map(post -> "<li>%s</li>".formatted(post.getTitle()))
+                .collect(Collectors.joining()) + "</ul>";
+
+        String body = """
                 <h1>글 목록</h1>
                 
-                <ul>
-                    <li>글1</li>
-                    <li>글2</li>
-                    <li>글3</li>
-                </ul>
+                %s
                 
                 <a href="/posts/write">글쓰기</a>
-                """;
+                """.formatted(ul);
         return body;
     }
 
@@ -51,18 +74,19 @@ public class PostController {
         return getFormHtml("", "", "");
     }
 
-    private record PostWriteForm (
-        @NotBlank(message = "01-제목을 입력해주세요.")
-        @Length(min = 5, message = "02-제목을 5자 이상 입력해주세요.")
-        String title,
+    private record PostWriteForm(
+            @NotBlank(message = "01-제목을 입력해주세요.")
+            @Length(min = 5, message = "02-제목을 5자 이상 입력해주세요.")
+            String title,
 
-        @NotBlank(message = "03-내용을 입력해주세요.")
-        @Length(min = 10, message = "04-내용을 10자 이상 입력해주세요.")
-        String content
-    ){}
+            @NotBlank(message = "03-내용을 입력해주세요.")
+            @Length(min = 10, message = "04-내용을 10자 이상 입력해주세요.")
+            String content
+    ) {
+    }
 
     @PostMapping("/write")
-    public String write(
+    public ResponseEntity<String> write(
             @Valid PostWriteForm form,
             BindingResult bindingResult
     ) {
@@ -75,13 +99,16 @@ public class PostController {
                     .map(message -> message.split("-")[1])
                     .collect(Collectors.joining("<br>"));
 
-            return getFormHtml(
-                    errorMessage,
-                    form.title,
-                    form.content
-            );
+            return ResponseEntity.badRequest().body(getFormHtml(errorMessage, form.title, form.content));
         }
 
-        return "redirect:/posts";
+        posts.add(
+                Post.builder()
+                        .title(form.title)
+                        .content(form.content)
+                        .build()
+        );
+
+        return ResponseEntity.status(302).header("Location", "/posts").build();
     }
 }
