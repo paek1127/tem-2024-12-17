@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/posts")
-@Validated
 public class PostController {
     private String getFormHtml(String errorMessage, String title, String content) {
         return """
@@ -49,7 +47,7 @@ public class PostController {
     @PostMapping("/write")
     @ResponseBody
     public String write(
-            @ModelAttribute @Valid PostWriteForm form
+            @Valid PostWriteForm form
     ) {
         System.out.println("form" + form);
         return """
