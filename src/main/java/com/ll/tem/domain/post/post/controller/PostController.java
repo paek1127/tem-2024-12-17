@@ -42,11 +42,11 @@ public class PostController {
             return """
                 <div>%s</div>
                 <form method="post">
-                    <input type="text" name="title" placeholder="제목">
+                    <input type="text" name="title" placeholder="제목" value="%s">
                     <textarea name="content" placeholder="내용"></textarea>
                     <button type="submit">글쓰기</button>
                 </form>
-                """.formatted("내용을 입력하세요");
+                """.formatted("내용을 입력하세요", title);
         }
         return """
                 <h1>글쓰기 완료</h1>
