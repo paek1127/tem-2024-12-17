@@ -28,6 +28,26 @@ public class PostController {
             String title,
             String content
     ) {
+        if (title == null || title.isBlank()) {
+            return """
+                <div>%s</div>
+                <form method="post">
+                    <input type="text" name="title" placeholder="제목">
+                    <textarea name="content" placeholder="내용"></textarea>
+                    <button type="submit">글쓰기</button>
+                </form>
+                """.formatted("제목을 입력하세요");
+        }
+        if (content == null || content.isBlank()) {
+            return """
+                <div>%s</div>
+                <form method="post">
+                    <input type="text" name="title" placeholder="제목">
+                    <textarea name="content" placeholder="내용"></textarea>
+                    <button type="submit">글쓰기</button>
+                </form>
+                """.formatted("내용을 입력하세요");
+        }
         return """
                 <h1>글쓰기 완료</h1>
                 
