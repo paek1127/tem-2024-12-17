@@ -7,10 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +53,9 @@ public class PostController {
     }
 
     @GetMapping("/write")
-    public String showWrite() {
+    public String showWrite(
+            @ModelAttribute("form") PostWriteForm form
+    ) {
         return "domain/post/post/write";
     }
 
@@ -73,7 +72,7 @@ public class PostController {
 
     @PostMapping("/write")
     public String write(
-            @Valid PostWriteForm form,
+            @ModelAttribute("form") @Valid PostWriteForm form,
             BindingResult bindingResult,
             Model model
     ) {
@@ -86,8 +85,6 @@ public class PostController {
                     .collect(Collectors.joining("<br>"));
 
             model.addAttribute("errorMessage", errorMessage);
-            model.addAttribute("title", form.title);
-            model.addAttribute("content", form.content);
 
             return "domain/post/post/write";
         }
