@@ -28,6 +28,23 @@ public class PostController {
                 """.formatted(errorMessage, title, content);
     }
 
+    @GetMapping
+    @ResponseBody
+    public String showList() {
+        String body =  """
+                <h1>글 목록</h1>
+                
+                <ul>
+                    <li>글1</li>
+                    <li>글2</li>
+                    <li>글3</li>
+                </ul>
+                
+                <a href="/posts/write">글쓰기</a>
+                """;
+        return body;
+    }
+
     @GetMapping("/write")
     @ResponseBody
     public String showWrite() {
@@ -45,7 +62,6 @@ public class PostController {
     ){}
 
     @PostMapping("/write")
-    @ResponseBody
     public String write(
             @Valid PostWriteForm form,
             BindingResult bindingResult
@@ -65,13 +81,7 @@ public class PostController {
                     form.content
             );
         }
-        return """
-                <h1>글쓰기 완료</h1>
-                
-                <div>
-                    <h2>%s</h2>
-                    <p>%s</p>
-                </div>
-                """.formatted(form.title, form.content);
+
+        return "redirect:/posts";
     }
 }
