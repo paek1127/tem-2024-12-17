@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -37,7 +38,21 @@ public class PostController {
     @GetMapping
     public String showList(Model model) {
         model.addAttribute("posts", posts.reversed());
+
         return "domain/post/post/list";
+    }
+
+    @GetMapping("/{id}")
+    public String showDetail(Model model, @PathVariable Long id) {
+        Post post = posts
+                .stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElseThrow();
+
+        model.addAttribute("post", post);
+
+        return "domain/post/post/detail";
     }
 
 
